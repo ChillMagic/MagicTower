@@ -1,0 +1,5 @@
+buffers=20
+device=musdrv.sys
+device = dc10fp.sys /c=64 /d=12
+shell=tirnanog.com
+
