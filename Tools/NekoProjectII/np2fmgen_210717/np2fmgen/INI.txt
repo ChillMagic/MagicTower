@@ -1,0 +1,58 @@
+INI追加項目
+
+OPNA_CLK	OPNA供給クロック(default=7987200)
+FMG_RATE	fmgen合成レート(default=55466)
+ENHANCED	拡張設定(ENHANCED.TXT参照)
+Priority	実行優先順位
+BEEP_PCM	BEEPPCMエミュレート方法
+lpforder	ユーザー設定LPF次数0～8(0でoff)
+lpfcutof	ユーザー設定LPFカットオフ周波数3000～24000(Hz)
+Function	ユーザーショートカット登録(Function.txt参照)
+FMWait_A	OPN(A)アドレスライト後のウェイト
+FMWait_D	OPN(A)データライト後のウェイト(FM音源部のみに適用)
+FMGenDll	外部音源dll
+DllList?	メニュー用外部音源dllリスト
+FDD_Wait	FDDアクセスウェイト(%)(default=100)
+MOUSESNS	マウス感度(default=64)
+CPUSPEED	実行スピード倍率(%)
+Odd_Line	200ラインモードの奇数ライン表示
+BOOTSKIP	起動スキップ
+S_HEIGHT	ディスプレイ最大ライン(default=480)
+86PCMTYP	86PCMタイプ
+
+DrawType	描画モード(0:DDフィルタあり/1:DDフィルタなし/2:D3D)
+SCRN_MUL	Windowサイズ状態(default=8)
+MIX_TYPE	QFM(0:off/1:on)
+COFF_LPF	QFM時のLPF(0:off/1:on)
+volume_C	CD音量(default=40)
+AAFILTER	アンチエイリアス
+STFILTER	拡大縮小アンチエイリアスフィルタ
+StatName	ステートネーム
+Dll_List	選択している外部音源dllリスト番号
+HDD3FILE	CDイメージファイル
+FDL_FILE	FDLファイル
+CPUSMENU	実行スピード倍率用カスタマイズ
+M_Volume	全体音量
+volume_V	VERMOUTH音量(default=40)
+DINPUT_K	DirectInput(キーボード)
+mpu98den	Use program define file (MIMPI define)
+FD_CACHE	FDイメージファイルアクセス方法
+HD_CACHE	HDイメージファイルアクセス方法
+statzlib	圧縮ステートファイル
+FIXDECPU	仮想マシンスレッド実行CPU固定
+JOYSTKID	ジョイスティック番号
+XInputID	ジョイスティック番号(XInput)
+DSCRNSAV	スクリーンセーバー抑制
+
+INI変更項目
+
+SampleHz	再生周波数(自由表記)
+DspClock	タイトルバー内容
+
+INIの10進数記述には2進数でも記述できます
+先頭に「b」を記述すると2進数として扱うようになります(01でのみ判別)
+ENHANCED=1032039
+ENHANCED=b11111011111101100111
+ENHANCED=b 1111 1011 1111 0110 0111
+ENHANCED=b IMGNAME:1 MOUSEC:1 SNDSPD:1 SPM:1 BIOS:1 PSG:0 NOTIFY:1 Soft:1 IDE:1 MPU:1 MOUSE:1 MINPUT:1 TOPMOST:0 RD:1 OW:1 S99:0 BAK:0 MTHREAD:1 TIMES:1 RAM:1
+全て同じ値になります
