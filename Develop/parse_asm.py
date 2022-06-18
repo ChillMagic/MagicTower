@@ -1,9 +1,10 @@
 import itertools
 import sys
-from typing import List, Union, Callable, Dict, Set, Optional
+from typing import List, Union, Callable, Dict, Set, Any
+from pathlib import Path
 
 
-DumpFuncType = Callable[[bytes], None]
+DumpFuncType = Callable[[bytes], Any]
 
 
 class Line(bytes):
@@ -20,15 +21,21 @@ class Function:
         self.tail: Line = Line(b'')
         self.units: List[Line] = []
         self.callees: Set[Function] = set()
+        self.is_clear: bool = False
+        self.is_used: bool = False
 
     def __repr__(self) -> str:
-        return f'<Function: {self.name}>'
+        return f'<Function: {self.name}{" clear" if self.is_clear else ""}>'
+
+    def clear(self):
+        self.is_clear = True
 
     def dump(self, func: DumpFuncType):
-        func(self.head)
-        for unit in self.units:
-            unit.dump(func)
-        func(self.tail)
+        if not self.is_clear:
+            func(self.head)
+            for unit in self.units:
+                unit.dump(func)
+            func(self.tail)
 
 
 class Segment:
@@ -38,6 +45,7 @@ class Segment:
         self.tail: Line = Line(b'')
         self.units: List[Union[Function, Line]] = []
         self.callees: Set[Function] = set()
+        self.ignore_line: bool = False
 
     def __repr__(self) -> str:
         return f'<Segment: {self.name}>'
@@ -45,6 +53,8 @@ class Segment:
     def dump(self, func: DumpFuncType):
         func(self.head)
         for unit in self.units:
+            if self.ignore_line and isinstance(unit, Line):
+                continue
             unit.dump(func)
         func(self.tail)
 
@@ -64,6 +74,9 @@ class File:
     def dump(self, func: DumpFuncType):
         for unit in self.units:
             unit.dump(func)
+        for function in self.foreign_functions:
+            if not function.is_clear:
+                func(b'extrn ' + function.name + b':near\n')
 
     def dump_lines(self) -> List[bytes]:
         result: List[bytes] = []
@@ -162,20 +175,51 @@ def unused_function_analysis(file: File, all_functions: Set[Function]) -> Set[Fu
     return all_functions - current_all_functions
 
 
+def unused_function_analysis2(file: File, entry_function: Function):
+    for function in file.function_map.values():
+        function.is_used = False
+    entry_function.is_used = True
+    queue = [entry_function]
+    used_function_set = set(queue)
+    while queue:
+        current_functions = queue
+        queue = []
+        for current_function in current_functions:
+            for callee in current_function.callees:
+                callee.is_used = True
+                if callee not in used_function_set:
+                    queue.append(callee)
+                    used_function_set.add(callee)
+    return used_function_set
+
+
 def main(args: List[str]) -> int:
-    with open('MTE.asm', 'rb') as f:
+    input_file = Path('MTE.asm')
+    output_file = input_file.with_suffix('.y.asm')
+    with input_file.open('rb') as f:
         data = f.readlines()
         file = parse(data)
         assert(data == file.dump_lines())
         data.clear()
     call_analysis(file)
     all_functions: Set[Function] = set(file.function_map.values())
-    unused_functions = unused_function_analysis(file, all_functions)
+    # unused_functions = unused_function_analysis(file, all_functions)
+    used_function_set = unused_function_analysis2(file, file.function_map[b'_main'])
+    unused_functions = all_functions - used_function_set
 
     print(unused_functions)
 
+    for function in unused_functions:
+        function.clear()
+    for segment in file.segments:
+        if segment.name != b'dseg':
+            segment.ignore_line = True
+
+    with output_file.open('wb+') as f:
+        file.dump(func=f.write)
+
     functions = {
-        file.function_map[b'sub_10000'],
+        file.function_map[b'_main'],
     }
     for caller in file.function_map.values():
         for callee in caller.callees:
