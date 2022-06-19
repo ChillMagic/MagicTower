@@ -194,8 +194,8 @@ def unused_function_analysis2(file: File, entry_function: Function):
 
 
 def main(args: List[str]) -> int:
-    input_file = Path('MTE.asm')
-    output_file = input_file.with_suffix('.y.asm')
+    input_file = Path('MAINx.asm')
+    output_file = Path(input_file.with_suffix('').name + '-y').with_suffix(input_file.suffix)
     with input_file.open('rb') as f:
         data = f.readlines()
         file = parse(data)
